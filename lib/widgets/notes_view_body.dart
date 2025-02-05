@@ -32,6 +32,7 @@ class _NotesViewBodyState extends State<NotesViewBody> {
 
   @override
   Widget build(BuildContext context) {
+    NotesCubit notesCubit = context.read<NotesCubit>();
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15),
       child: Column(
@@ -49,8 +50,8 @@ class _NotesViewBodyState extends State<NotesViewBody> {
               setState(() {
                 isTextFieldVisible = !isTextFieldVisible;
                 widget.isImportant
-                    ? BlocProvider.of<NotesCubit>(context).fetchFavouriteNotes()
-                    : BlocProvider.of<NotesCubit>(context).fetchAllNotes();
+                    ? notesCubit.fetchFavouriteNotes()
+                    : notesCubit.fetchAllNotes();
               });
             },
             title: widget.isImportant
@@ -71,22 +72,19 @@ class _NotesViewBodyState extends State<NotesViewBody> {
               padding: const EdgeInsets.symmetric(vertical: 4),
               child: BlocBuilder<NotesCubit, NotesState>(
                 builder: (context, state) {
-                  final notes =
-                      BlocProvider.of<NotesCubit>(context).filteredData ?? [];
-                  if (BlocProvider.of<NotesCubit>(context).notes!.length > 0 &&
-                      notes.isEmpty &&
+                  notesCubit.filteredData ?? [];
+                  if (notesCubit.notes!.length > 0 &&
+                      notesCubit.filteredData!.isEmpty &&
                       isTextFieldVisible == true) {
                     // Display message and image and image if no notes
                     return noNotesInSearch();
-                  } else if (notes.isEmpty) {
+                  } else if (notesCubit.filteredData!.isEmpty) {
                     // Display message and image and image if no notes
                     return noNotesView(
-                        isNormalNotes:
-                            context.read<NotesCubit>().notes?.isNotEmpty ??
-                                false);
+                        isNormalNotes: notesCubit.notes?.isNotEmpty ?? false);
                   } else {
                     // Display list of notes
-                    return notesList(notes);
+                    return notesList(notesCubit.filteredData!);
                   }
                 },
               ),
@@ -138,16 +136,25 @@ class _NotesViewBodyState extends State<NotesViewBody> {
       padding: const EdgeInsets.all(0),
       itemBuilder: (context, index) {
         return Padding(
-            padding: EdgeInsets.symmetric(vertical: 6.h),
-            child: NoteItem(
-              noteModel: notes[index],
-            )
-                .animate()
-                .flip(duration: 1.seconds)
-                .scale(duration: 500.milliseconds));
+          padding: EdgeInsets.symmetric(vertical: 6.h),
+          child: NoteItem(
+
+            noteModel: notes[index],
+            onDelete: () {
+              // Remove the note from the list when it's deleted
+              setState(() {
+                notes.removeAt(index);
+              });
+            },
+          )
+              .animate()
+              .flip(duration: 1.seconds)
+              .scale(duration: 500.milliseconds),
+        );
       },
     );
   }
+
 
 //**********************//
   Widget noNotesView({required bool isNormalNotes}) {
@@ -163,7 +170,7 @@ class _NotesViewBodyState extends State<NotesViewBody> {
         SizedBox(height: 20.h),
         Text(
           isNormalNotes
-              ? AppLocalizations.of(context)!.favourite_notes
+              ? AppLocalizations.of(context)!.fav_not_found
               : AppLocalizations.of(context)!.create_ur_first_note,
           textAlign: TextAlign.center,
           style: TextStyle(

@@ -12,7 +12,9 @@ class InfoView extends StatelessWidget {
       backgroundColor: Colors.grey,
       appBar: AppBar(
         backgroundColor: Colors.grey,
-        title:  Text(AppLocalizations.of(context)!.about,),
+        title: Text(
+          AppLocalizations.of(context)!.about,
+        ),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -31,7 +33,7 @@ class InfoView extends StatelessWidget {
                     horizontal: 15.w,
                   ),
                   child: Column(
-                    spacing: 30.h,
+                    spacing: 20.h,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       SizedBox(
@@ -44,7 +46,6 @@ class InfoView extends StatelessWidget {
                           image: 'assets/images/logoSplash.png',
                           title: AppLocalizations.of(context)!.app_title,
                           isCenter: true),
-
                       Text(
                         AppLocalizations.of(context)!.about,
                         style: TextStyle(
@@ -52,7 +53,6 @@ class InfoView extends StatelessWidget {
                             fontSize: 12.sp,
                             fontWeight: FontWeight.bold),
                       ),
-
                       customText(
                         AppLocalizations.of(context)!.storage_info,
                       ),
@@ -61,8 +61,6 @@ class InfoView extends StatelessWidget {
                       ),
                       customText(
                         AppLocalizations.of(context)!.platform_info,
-                      ), customText(
-                        AppLocalizations.of(context)!.designed_by,
                       ),
                       customText(
                         AppLocalizations.of(context)!.version_info,
@@ -80,17 +78,41 @@ class InfoView extends StatelessWidget {
                         fontSize: 16.sp,
                         imageSize: 25.h,
                         image: 'assets/images/linkedLogo.png',
-                        title:  AppLocalizations.of(context)!.linkedin,
+                        title: AppLocalizations.of(context)!.linkedin,
                       ),
                       row(
                         urlLink: 'https://ahmedoraby-portfolio.vercel.app/',
                         fontSize: 16.sp,
                         imageSize: 25.h,
                         image: 'assets/images/portfolio.png',
-                        title:  AppLocalizations.of(context)!.portfolio,
+                        title: AppLocalizations.of(context)!.portfolio,
+                      ),
+                      Text(
+                        AppLocalizations.of(context)!.help_center,
+                        style: TextStyle(
+                            color: Colors.amber,
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      customText(
+                        AppLocalizations.of(context)!.bug_feature_request,
+                      ),
+                      row(
+                        urlLink: 'https://Wa.me/201202934495',
+                        fontSize: 16.sp,
+                        imageSize: 25.h,
+                        image: 'assets/images/whatsapp.png',
+                        title: AppLocalizations.of(context)!.whatsapp,
+                      ),
+                      row(
+                        urlLink: 'mailto:ahmedoraby046@gmail.com',
+                        fontSize: 16.sp,
+                        imageSize: 25.h,
+                        image: 'assets/images/gmail.png',
+                        title: AppLocalizations.of(context)!.gmail,
                       ),
                       SizedBox(
-                        height: 40.h,
+                        height: 10.h,
                       ),
                     ],
                   ),
@@ -102,6 +124,18 @@ class InfoView extends StatelessWidget {
       ),
     );
   }
+
+// Inside your InfoView class
+//   void _openGmail() async {
+//     final Uri emailUri = Uri.parse("mailto:ahmedoraby046@gmail.com");
+//     // Opens Gmail if installed
+//     if (await launchUrl(emailUri)) {
+//       await launchUrl(emailUri);
+//     } else {
+//       print('🍉🍉🍉');
+//       await launchUrl(Uri.parse("https://mail.google.com"));
+//     }
+//   }
 
   Widget row({
     required String image,
@@ -115,11 +149,24 @@ class InfoView extends StatelessWidget {
       onTap: isCenter
           ? () {}
           : () async {
-              final url = Uri.parse(urlLink!);
-              if (await canLaunchUrl(url)) {
-                await launchUrl(url);
-              } else {
-                throw 'Could not launch $url';
+              // _openGmail();
+              if (urlLink != null) {
+                final Uri url = Uri.parse(urlLink);
+                if (urlLink.startsWith('mailto:')) {
+                  // Handle email links
+                  if (await launchUrl(url)) {
+                    await launchUrl(url);
+                  } else {
+                     throw 'Could not launch $url';
+                  }
+                } else {
+                  // Handle other URLs
+                  if (await launchUrl(url)) {
+                    await launchUrl(url);
+                  } else {
+                    throw 'Could not launch $url';
+                  }
+                }
               }
             },
       child: Row(

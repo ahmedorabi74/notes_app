@@ -14,9 +14,11 @@ import '../views/view_full_note_view.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class NoteItem extends StatefulWidget {
-  const NoteItem({super.key, required this.noteModel});
+  const NoteItem({super.key, required this.noteModel,  required this.onDelete});
 
   final NoteModel noteModel;
+
+  final VoidCallback onDelete;
 
   @override
   State<NoteItem> createState() => _NoteItemState();
@@ -155,25 +157,22 @@ class _NoteItemState extends State<NoteItem> {
             ),
             TextButton(
               onPressed: () async {
-                // Delete the note and fetch updated list of notes
                 Navigator.pop(context);
                 _deleteSound();
+
                 setState(() {
                   isDeleted = true;
                 });
-                //_deleteSound();
-                await Future.delayed(
-                    const Duration(seconds: 1)); // Simulate animation time
+
+                await Future.delayed(const Duration(seconds: 1)); // Simulate animation time
                 note.delete();
+
                 setState(() {
                   isDeleted = false;
                 });
-                widget.noteModel.isImportant
-                    ? BlocProvider.of<NotesCubit>(parentContext)
-                        .fetchFavouriteNotes()
-                    : BlocProvider.of<NotesCubit>(parentContext)
-                        .fetchAllNotes();
-                Navigator.pop(context);
+
+                // Call the callback function to remove the note from the list
+                widget.onDelete();
               },
               child: Text(
                 AppLocalizations.of(context)!.delete,

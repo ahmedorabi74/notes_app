@@ -36,41 +36,34 @@ class _EditNoteViewBodyState extends State<EditNoteViewBody> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          const SizedBox(
-            height: 50,
-          ),
-          CustomAppBAr(
-            isHome: false,
-            shimmerColor: Color(widget.noteModel.color),
-            onPressed: () {
-              widget.noteModel.title = title ?? widget.noteModel.title;
-              widget.noteModel.subTitle = subTitle ?? widget.noteModel.subTitle;
-              widget.noteModel.save();
-              BlocProvider.of<NotesCubit>(context).fetchAllNotes();
-              Navigator.pop(context);
-              _editSound();
-              const CustomFlushbar().showCustomFlushbar(
-                  context: context,
-                  duration: 2,
-                  type: 'success',
-                  title: AppLocalizations.of(context)!.success,
-                  message:   AppLocalizations.of(context)!.note_added_success,
-                  icon: CupertinoIcons.checkmark);
-            },
-            icon: const Icon(
-              Icons.check,
-              size: 28,
-              color: CupertinoColors.white,
+    return WillPopScope(
+      onWillPop: () async {
+        return await showExitDialog(context);
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            const SizedBox(
+              height: 50,
             ),
-            title: AppLocalizations.of(context)!.edit_note,
-          ),
-          Expanded(child: _body()),
-        ],
+            CustomAppBAr(
+              isHome: false,
+              shimmerColor: Color(widget.noteModel.color),
+              onPressed: () {
+                saveNote(context);
+              },
+              icon: const Icon(
+                Icons.check,
+                size: 28,
+                color: CupertinoColors.white,
+              ),
+              title: AppLocalizations.of(context)!.edit_note,
+            ),
+            Expanded(child: _body()),
+          ],
+        ),
       ),
     );
   }
@@ -88,7 +81,7 @@ class _EditNoteViewBodyState extends State<EditNoteViewBody> {
             onChanged: (value) {
               title = value;
             },
-            hintText:   AppLocalizations.of(context)!.edit_title_hint,
+            hintText: AppLocalizations.of(context)!.edit_title_hint,
           ),
           const SizedBox(
             height: 16,
@@ -99,7 +92,7 @@ class _EditNoteViewBodyState extends State<EditNoteViewBody> {
             onChanged: (value) {
               subTitle = value;
             },
-            hintText:   AppLocalizations.of(context)!.edit_content_hint,
+            hintText: AppLocalizations.of(context)!.edit_content_hint,
             maxLines: 10,
           ),
           SizedBox(
@@ -110,6 +103,60 @@ class _EditNoteViewBodyState extends State<EditNoteViewBody> {
           ),
         ],
       ),
+    );
+  }
+
+  Future<bool> showExitDialog(BuildContext context) async {
+    return await showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text(
+              AppLocalizations.of(context)!.exit_edit_title,
+            ),
+            content: Text(
+              AppLocalizations.of(context)!.exit_edit_message,
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  // First close the dialog
+                  Navigator.of(context).pop(false); // false → don't exit yet
+                  // Then save the note
+                  saveNote(context);
+                },
+                child: Text(
+                  AppLocalizations.of(context)!.exit_edit_no,
+                ),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: Text(
+                  AppLocalizations.of(context)!.exit_edit_yes,
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+  }
+
+  void saveNote(BuildContext context) {
+    widget.noteModel.title = title ?? widget.noteModel.title;
+    widget.noteModel.subTitle = subTitle ?? widget.noteModel.subTitle;
+    widget.noteModel.save();
+
+    BlocProvider.of<NotesCubit>(context).fetchAllNotes();
+    Navigator.pop(context);
+    _editSound();
+
+    const CustomFlushbar().showCustomFlushbar(
+      context: context,
+      duration: 2,
+      type: 'success',
+      title: AppLocalizations.of(context)!.success,
+      message: AppLocalizations.of(context)!.note_added_success,
+      icon: CupertinoIcons.checkmark,
     );
   }
 }

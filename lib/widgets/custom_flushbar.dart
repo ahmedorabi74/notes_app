@@ -16,7 +16,7 @@ class CustomFlushbar extends StatelessWidget {
     List<Color> colors;
     switch (type) {
       case 'success':
-        colors = [Colors.green, Colors.white];
+        colors = [Colors.green, Colors.greenAccent, Colors.greenAccent,];
         break;
       case 'error':
         colors = [Colors.red, Colors.orange];
@@ -38,8 +38,8 @@ class CustomFlushbar extends StatelessWidget {
       ),
       margin: const EdgeInsets.all(8),
       borderRadius: BorderRadius.circular(8),
-      titleColor: Colors.black,
-      messageColor: Colors.black,
+      titleColor: Colors.white,
+      messageColor: Colors.white,
       icon: Icon(icon, color: Colors.white),
     ).show(context);
   }

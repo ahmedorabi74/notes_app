@@ -1,15 +1,63 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
+import '../main.dart';
+import '../service/finger_print_service.dart';
 import 'notes_view.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-class SplashView extends StatelessWidget {
+class SplashView extends StatefulWidget {
   const SplashView({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  State<SplashView> createState() => _SplashViewState();
+}
+
+class _SplashViewState extends State<SplashView> {
+  final LocalAuthService _authService = LocalAuthService();
+  bool _isAuthenticated = false; // Control UI rendering
+  bool fingerPrintEnabled = sharedPref.getBool('fingerprint') ?? false;
+
+  @override
+  void initState() {
+    super.initState();
+    fingerPrintEnabled ? _authenticateOnStart() : null;
+  }
+
+
+
+  Future<void> _authenticateOnStart() async {
+    bool isAuthenticated = await _authService.authenticate();
+
+    if (!isAuthenticated) {
+      Fluttertoast.showToast(
+        msg: "Authentication Failed",
+        toastLength: Toast.LENGTH_LONG,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0.sp,
+      );
+
+      Future.delayed(const Duration(seconds: 1), () {
+        Navigator.pop(context); // Exit if authentication fails
+      });
+      return;
+    }
+
+    setState(() {
+      _isAuthenticated = true; // Show the UI only after authentication
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {  if (!_isAuthenticated && fingerPrintEnabled) {
+    return const Scaffold(
+      backgroundColor: Colors.black,
+      body: Center(child: CircularProgressIndicator(color: Colors.white)),
+    );
+  }
     Future.delayed(const Duration(seconds: 3), () {
       Navigator.pushReplacement(
         context,
@@ -18,6 +66,7 @@ class SplashView extends StatelessWidget {
         ),
       );
     });
+
     return Scaffold(
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 30.w),

@@ -33,7 +33,6 @@
   "title": "Titel",
   "content": "Inhalt",
   "add": "Hinzufügen",
-  "field_required": "Feld erforderlich",
   "confirm_delete": "Löschen bestätigen",
   "delete_confirmation": "Bist du sicher, dass du diese Notiz löschen möchtest?",
   "cancel": "Abbrechen",
@@ -41,6 +40,16 @@
   "choose_action": "Aktion auswählen",
   "edit": "Bearbeiten",
   "delete_action": "Löschen",
-  "fav_notes" : "Favoriten-Notizen",
-  "fav_not_found": "Du hast keine Favoriten-Notizen. Erstelle deine erste Notiz!"
+  "fav_notes": "Favoriten-Notizen",
+  "fav_not_found": "Du hast keine Favoriten-Notizen. Erstelle deine erste Notiz!",
+  "required": "Dieses Feld ist erforderlich",
+  "exit_edit_title": "Bearbeitungsseite verlassen",
+  "exit_edit_message": "Sind Sie sicher, dass Sie ohne Speichern beenden möchten?",
+  "exit_edit_no": "Nein, zuerst speichern",
+  "exit_edit_yes": "Ja, nicht speichern",
+  "help_center": "Hilfezentrum",
+  "bug_feature_request": "Wenn du Fehler findest oder eine Funktion für die App hinzufügen möchtest, lass es uns jetzt wissen.",
+  "whatsapp": "WhatsApp",
+  "gmail": "Gmail",
+  "finger_print" : "Fingerabdruck"
 }

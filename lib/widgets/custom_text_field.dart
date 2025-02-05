@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:notesss_app/constans.dart';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 class CustomTextField extends StatelessWidget {
   const CustomTextField(
       {super.key,
@@ -26,7 +26,7 @@ class CustomTextField extends StatelessWidget {
       onSaved: onSaved,
       validator: (value) {
         if ((value?.trim().isEmpty ?? true)) {
-          return 'Field is required';
+          return AppLocalizations.of(context)!.required;
         }
         else {
           return null;

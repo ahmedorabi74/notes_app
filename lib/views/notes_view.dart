@@ -8,9 +8,9 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:notesss_app/cubits/langage_cubit/langage_cubit.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../constans.dart';
 import '../cubits/notes_cubit/notes_cubit.dart';
 import '../main.dart';
+import '../service/finger_print_service.dart';
 import '../widgets/add_note_bottom_sheet.dart';
 import '../widgets/notes_view_body.dart';
 import 'info_view.dart';
@@ -26,34 +26,44 @@ class NotesView extends StatefulWidget {
 class _NotesViewState extends State<NotesView> {
   bool isImportant = false;
 
+  // getter from bool in shared pref
+  bool fingerPrintEnabled = sharedPref.getBool('fingerprint') ?? false;
+
+// setter from bool in shared pref
+  static Future<void> setFingerPrintValue() async {
+    bool currentValue = sharedPref.getBool('fingerprint') ?? false; // Get current value
+    await sharedPref.setBool('fingerprint', !currentValue); // Toggle value
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: drawer(context),
-      floatingActionButton: FloatingActionButton(
-        shape: const CircleBorder(),
-        backgroundColor: const Color(0xff252525),
-        onPressed: () {
-          showModalBottomSheet(
-            isScrollControlled: true,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16.r),
+      floatingActionButton: isImportant
+          ? null
+          : FloatingActionButton(
+              shape: const CircleBorder(),
+              backgroundColor: const Color(0xff252525),
+              onPressed: () {
+                showModalBottomSheet(
+                  isScrollControlled: true,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16.r),
+                  ),
+                  context: context,
+                  builder: (context) {
+                    return const AddNoteBottomSheet();
+                  },
+                );
+              },
+              child: Icon(
+                Icons.add,
+                color: Colors.white,
+                size: 48.h,
+              ),
             ),
-            context: context,
-            builder: (context) {
-              return const AddNoteBottomSheet();
-            },
-          );
-        },
-        child: Icon(
-          Icons.add,
-          color: Colors.white,
-          size: 48.h,
-        ),
-      ),
-      body: NotesViewBody(
-        isImportant: isImportant,
-      ),
+      body: NotesViewBody(isImportant: isImportant),
     );
   }
 
@@ -83,7 +93,6 @@ class _NotesViewState extends State<NotesView> {
                 isImportant = false;
               });
               BlocProvider.of<NotesCubit>(context).fetchAllNotes();
-
               Navigator.pop(context);
             },
             icon: FontAwesomeIcons.solidNoteSticky,
@@ -92,9 +101,9 @@ class _NotesViewState extends State<NotesView> {
             context: context,
             title: AppLocalizations.of(context)!.favourite_notes,
             onPressed: () {
-             setState(() {
-               isImportant = true;
-             });
+              setState(() {
+                isImportant = true;
+              });
               BlocProvider.of<NotesCubit>(context).fetchFavouriteNotes();
               Navigator.pop(context);
             },
@@ -103,10 +112,14 @@ class _NotesViewState extends State<NotesView> {
           listTileForDrawer(
             context: context,
             title: AppLocalizations.of(context)!.language,
-            onPressed: () {
-              showToast();
-            },
+            onPressed: showToast,
             icon: Icons.language,
+          ),
+          listTileForDrawer(
+            context: context,
+            title: AppLocalizations.of(context)!.finger_print,
+            onPressed: () {},
+            icon: FontAwesomeIcons.fingerprint,
           ),
           listTileForDrawer(
             context: context,
@@ -143,36 +156,45 @@ class _NotesViewState extends State<NotesView> {
     required IconData icon,
     required VoidCallback onPressed,
   }) {
+    bool isFingerPrint = title == 'Finger Print' ||
+        title == 'Fingerabdruck' ||
+        title == 'بصمة الإصبع';
+
     return ListTile(
       leading: IconButton(
         onPressed: onPressed,
-        icon: Icon(
-          icon,
-          color: Colors.amber,
-        ),
+        icon: Icon(icon, color: Colors.amber),
       ),
       title: Text(title),
-      trailing: title == 'Language' || title == 'Sprache' || title == 'اللغة'
-          ? PopupMenuButton<String>(
-              onSelected: (value) {
-                // Handle the language selection
-                BlocProvider.of<LangCubit>(context).changeLanga(value);
-              },
-              itemBuilder: (BuildContext context) {
-                return [
-                  popupMenuItem(value: 'ar', text: 'عربي', flag: 'ar-eg'),
-                  popupMenuItem(value: 'en', text: 'English', flag: 'en-us'),
-                  popupMenuItem(value: 'de', text: 'Deutsch', flag: 'de'),
-                ];
-              },
-              icon: const Icon(
-                Icons.arrow_drop_down,
-                color: Colors.amber,
-                size: 32,
-              ),
-            )
-          : null, // Only show the trailing icon if the title is 'Language'
-      onTap: onPressed, // Calls onPressed when the tile is tapped
+      trailing: isFingerPrint
+          ? Switch(
+        value: fingerPrintEnabled,
+        onChanged: (bool value) async {
+          await setFingerPrintValue(); // Toggle value in SharedPreferences
+          setState(() {
+            fingerPrintEnabled = !fingerPrintEnabled; // Toggle UI state
+          });
+        },
+        activeColor: Colors.amber,
+      )
+          : (title == 'Language' || title == 'Sprache' || title == 'اللغة'
+              ? PopupMenuButton<String>(
+                  onSelected: (value) {
+                    BlocProvider.of<LangCubit>(context).changeLanga(value);
+                  },
+                  itemBuilder: (BuildContext context) {
+                    return [
+                      popupMenuItem(value: 'ar', text: 'عربي', flag: 'ar-eg'),
+                      popupMenuItem(
+                          value: 'en', text: 'English', flag: 'en-us'),
+                      popupMenuItem(value: 'de', text: 'Deutsch', flag: 'de'),
+                    ];
+                  },
+                  icon: const Icon(Icons.arrow_drop_down,
+                      color: Colors.amber, size: 32),
+                )
+              : null),
+      onTap: onPressed,
     );
   }
 
@@ -180,15 +202,17 @@ class _NotesViewState extends State<NotesView> {
     Fluttertoast.showToast(
       msg: AppLocalizations.of(context)!.language_menu_hint,
       toastLength: Toast.LENGTH_LONG,
-      //gravity: ToastGravity.CENTER,
       backgroundColor: Colors.orange,
       textColor: Colors.white,
       fontSize: 16.0.sp,
     );
   }
 
-  PopupMenuItem<String> popupMenuItem(
-      {required String value, required String text, required String flag}) {
+  PopupMenuItem<String> popupMenuItem({
+    required String value,
+    required String text,
+    required String flag,
+  }) {
     return PopupMenuItem<String>(
       value: value,
       child: Row(
