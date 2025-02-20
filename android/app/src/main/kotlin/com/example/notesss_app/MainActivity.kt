@@ -1,4 +1,4 @@
-package com.example.notesss_app
+package com.ahmedoraby.notes
 
 import io.flutter.embedding.android.FlutterFragmentActivity
 

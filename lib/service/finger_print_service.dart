@@ -6,7 +6,8 @@ class LocalAuthService {
   /// Check if biometric authentication is available
   Future<bool> isBiometricAvailable() async {
     try {
-      return await _localAuth.canCheckBiometrics || await _localAuth.isDeviceSupported();
+      return await _localAuth.canCheckBiometrics ||
+          await _localAuth.isDeviceSupported();
     } catch (e) {
       return false;
     }
