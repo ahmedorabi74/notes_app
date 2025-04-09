@@ -4,6 +4,8 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.INTERNET"/>
 
+    <meta-data android:name="io.flutter.embedding.android.EnableImpeller"
+        android:value="false" />
     <uses-permission android:name="android.permission.USE_BIOMETRIC"/>
     <!-- Provide required visibility configuration for API level 30 and above -->
     <queries>

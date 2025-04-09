@@ -1,0 +1,2 @@
+D:/Dart and Flutter/Flutter Projects/notesss_app/android/app/.cxx/Debug/2j4r3s1q/arm64-v8a/CMakeFiles/edit_cache.dir
+D:/Dart and Flutter/Flutter Projects/notesss_app/android/app/.cxx/Debug/2j4r3s1q/arm64-v8a/CMakeFiles/rebuild_cache.dir

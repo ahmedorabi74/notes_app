@@ -24,7 +24,7 @@
   "internet_info": "- Internet: Nicht erforderlich",
   "platform_info": "- Plattform: Android",
   "designed_by": "- Entwickelt von: Ahmed Oraby",
-  "version_info": "- Version: 1.0.0",
+  "version_info": "- Version: 1.0.1",
   "social_media": "SOZIALE MEDIEN",
   "linkedin": "LinkedIn",
   "portfolio": "Portfolio",
@@ -51,5 +51,7 @@
   "bug_feature_request": "Wenn du Fehler findest oder eine Funktion für die App hinzufügen möchtest, lass es uns jetzt wissen.",
   "whatsapp": "WhatsApp",
   "gmail": "Gmail",
-  "finger_print" : "Fingerabdruck"
+  "finger_print" : "Fingerabdruck",
+  "ramadan" : "Gesegneten Ramadan!"
+
 }

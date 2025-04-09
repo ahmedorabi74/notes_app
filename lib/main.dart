@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:http/http.dart' as http;
 import 'package:notesss_app/constLan.dart';
 import 'package:notesss_app/cubits/langage_cubit/langage_cubit.dart';
 import 'package:notesss_app/cubits/langage_cubit/langage_state.dart';
@@ -9,7 +10,10 @@ import 'package:notesss_app/cubits/langage_cubit/langage_state.dart';
 import 'package:notesss_app/simple_bloc_observer.dart';
 
 import 'package:flutter_screenutil/flutter_screenutil.dart'; // Import ScreenUtil package
+import 'package:notesss_app/views/ramadan_splash.dart';
 import 'package:notesss_app/views/splash_view.dart';
+import 'package:notesss_app/views/update_app.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'constans.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -22,6 +26,12 @@ late SharedPreferences sharedPref;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   sharedPref = await SharedPreferences.getInstance();
+  PackageInfo packageInfo = await PackageInfo.fromPlatform();
+  String packageName = packageInfo.packageName;
+  String? storeVersion = await getLatestVersionFromPlayStore(packageName);
+
+  String appVersion = packageInfo.version;
+  debugPrint("$storeVersion + $appVersion ⭐⭐");
 
   Bloc.observer =
       SimpleBlocObserver(); // Follow your bloc states with an easy way instead of print
@@ -30,11 +40,16 @@ void main() async {
   await Hive.openBox(kNotesBox);
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp]); // Lock to portrait mode
-  runApp(MyApp());
+
+  runApp(MyApp(
+      isUpdateAvailable:
+          storeVersion != appVersion && storeVersion != '1.0.0'));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final bool isUpdateAvailable;
+
+  const MyApp({super.key, required this.isUpdateAvailable});
 
   @override
   Widget build(BuildContext context) {
@@ -80,8 +95,8 @@ class MyApp extends StatelessWidget {
                   Locale('ar'),
                   Locale('de'),
                 ],
-                home: const Scaffold(
-                  body: SplashView(),
+                home: Scaffold(
+                  body: isUpdateAvailable ? UpdateApp() : SplashView(),
                 ),
               );
             },
@@ -90,4 +105,17 @@ class MyApp extends StatelessWidget {
       },
     );
   }
+}
+
+Future<String?> getLatestVersionFromPlayStore(String packageName) async {
+  final url = Uri.parse(
+      "https://play.google.com/store/apps/details?id=$packageName&hl=en&gl=US");
+
+  final response = await http.get(url);
+  if (response.statusCode == 200) {
+    final regex = RegExp(r'\[\[\["(\d+\.\d+\.\d+)"\]\]');
+    final match = regex.firstMatch(response.body);
+    return match?.group(1); // Extract version if found
+  }
+  return null;
 }

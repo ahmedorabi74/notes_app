@@ -24,7 +24,7 @@
   "internet_info": "- Internet : Not Required",
   "platform_info": "- Platform : Android",
   "designed_by": "- Designed by : Ahmed Oraby",
-  "version_info": "- Version : 1.0.0",
+  "version_info": "- Version : 1.0.1",
   "social_media": "SOCIAL MEDIA",
   "linkedin": "LinkedIn",
   "portfolio": "Portfolio",
@@ -52,7 +52,8 @@
   "bug_feature_request": "If you encounter any bugs or have a feature request for the app, please let us know.",
   "whatsapp": "WhatsApp",
   "gmail": "Gmail",
-  "finger_print" : "Finger Print"
+  "finger_print" : "Finger Print",
+  "ramadan" : "Ramadan Kareem!"
 
 
 }
